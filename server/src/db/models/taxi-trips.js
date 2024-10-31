@@ -9,6 +9,11 @@ module.exports = (sequelize, DataTypes) => {
       }
    }
    taxi_trips.init({
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4, 
+      primaryKey: true,
+    },
     user_id: {
       type: DataTypes.UUID,
       allowNull: false,
@@ -40,7 +45,7 @@ module.exports = (sequelize, DataTypes) => {
       field:'RatecodeID'
     },
     store_and_fwd_flag: {
-      type: DataTypes.STRING(1), // Single character (Y or N)
+      type: DataTypes.STRING,
       allowNull: true
     },
     PULocationID: {

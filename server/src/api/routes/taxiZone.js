@@ -78,7 +78,7 @@ csvQueue.process(async (job) => {
   let totalRows = 0;
 
   
-  //total row count for calculating progress
+  // total row count for calculating progress
   // await new Promise((resolve) => {
   //   fs.createReadStream(job.data.filePath)
   //     .pipe(csv())
@@ -86,18 +86,20 @@ csvQueue.process(async (job) => {
   //     .on('end', resolve);
   // });
 
+  // console.log("totalRows======",totalRows)
+
   fs.createReadStream(job.data.filePath)
       .pipe(csv())
       .on('data', (data) => {
         results.push({
           ...data,
-          id: uuidv4(),
-          user_id: '6d679b2c-cb23-442d-8729-648277605e84',
+          // id: uuidv4(),
+          user_id: 'b77b7a11-6605-4718-89a0-10d77cbfb390',
         });
         rowsProcessed++;
 
-        const progress = Math.round((rowsProcessed / totalRows) * 100);
-        io.to(job.id).emit('processingProgress', { jobId: job.id, progress });
+        // const progress = Math.round((rowsProcessed / totalRows) * 100);
+        // io.to(job.id).emit('processingProgress', { jobId: job.id, progress });
         // console.log(`Progress for job ${job.id}: ${progress}%`);
       })
       .on('end', async () => {
@@ -109,13 +111,20 @@ csvQueue.process(async (job) => {
               //Batch processing
               // await taxi_trips.create(results[2]);
 
-              // const BATCH_SIZE = 1000;
+              const BATCH_SIZE = 200000;
+              console.log("Bulk Creation started")
               // // async function insertTripsInBatches(tripsData) {
-                for (let i = 0; i < results.length; i++) {
-                  // const batch = results.slice(i, i + BATCH_SIZE);
+                for (let i = 0; i < results.length; i+= BATCH_SIZE) {
+                  const batch = results.slice(i, i + BATCH_SIZE);
                   try {
                     // await taxi_trips.create(results[i]);
-                    await taxi_trips.create(results[i]);
+                    await taxi_trips.bulkCreate(batch)
+                    .then(() => {
+                      // console.log("Trips have been added successfully!");
+                    })
+                    .catch((error) => {
+                      console.error("Error in bulk creation:", error);
+                    });
 
                     console.log(`Inserted batch ${i}`);
                   } catch (error) {
@@ -150,11 +159,13 @@ router.post('/upload',
   // validateRequest,
   // passport.authenticate('jwt', { session: false }),
   // rbac.allowedRoles([ROLES.SUPER_ADMIN]),
-  upload.array('files', 10),
+  upload.single('file'),
   async (req, res, next) => {
     try {
-      console.log(req.files)
-      if (!files) {
+      console.log(req.file)
+      let file = req.file;
+
+      if (!file) {
         return res.status(400).send("No file uploaded");
       }
 
@@ -162,10 +173,12 @@ router.post('/upload',
         return res.status(400).send("Invalid file format. Please upload a CSV file.");
       }
 
-      const jobs = req.files.map(file => csvQueue.add({ filePath: file.path}));
-      const jobIds = await Promise.all(jobs);
+      // const jobs = req.files.map(file => csvQueue.add({ filePath: file.path}));
+      // const jobIds = await Promise.all(jobs);
 
-      res.status(202).json(successResponseGenerator( {jobs:jobIds.map(job => job.id)} ,'File is being processed' ));
+      const jobId = csvQueue.add({ filePath: file.path})
+
+      res.status(202).json(successResponseGenerator( {jobs:jobId},'File is being processed' ));
 
     } catch (error) {
       return res.status(500).json(createResponse({
@@ -260,8 +273,8 @@ router.post('/test',async(req,res) => {
   try {
     await taxi_trips.create(
       {
-        id: uuidv4(),
-        user_id: '6d679b2c-cb23-442d-8729-648277605e84',
+        // id: uuidv4(),
+        user_id: 'b77b7a11-6605-4718-89a0-10d77cbfb390',
         VendorID: '2',
         tpep_pickup_datetime: '2024-02-01 00:28:54.000000',
         tpep_dropoff_datetime: '2024-02-01 00:29:18.000000',

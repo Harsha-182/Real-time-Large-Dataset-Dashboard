@@ -44,7 +44,7 @@ module.exports = {
         allowNull: true
       },
       store_and_fwd_flag: {
-        type: Sequelize.STRING(1), // Single character (Y or N)
+        type: Sequelize.STRING,
         allowNull: true
       },
       PULocationID: {
