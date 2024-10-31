@@ -1,0 +1,39 @@
+{
+  "name": "nodejs",
+  "version": "1.0.0",
+  "description": "Nodejs File Structure for reference",
+  "main": "app.js",
+  "scripts": {
+    "start": "--max-old-space-size=8192 node ./src/bin/www",
+    "dev": "--max-old-space-size=8192 nodemon ./src/bin/www"
+  },
+  "author": "Celestial Systems (Nodejs)",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "bull": "^4.16.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "csv-parser": "^3.0.0",
+    "dotenv": "^16.0.3",
+    "express": "^4.21.1",
+    "express-validator": "^6.14.3",
+    "http-errors": "^2.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "moment": "^2.29.4",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.8",
+    "nodemon": "^2.0.20",
+    "passport": "^0.6.0",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0",
+    "pg": "^8.9.0",
+    "sequelize": "^6.29.0",
+    "sequelize-cli": "^6.6.0",
+    "socket.io": "^4.8.1",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "node-file-logger": "^0.9.5"
+  }
+}

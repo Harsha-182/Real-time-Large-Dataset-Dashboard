@@ -1,0 +1,5 @@
+#NodeJs Code
+/server/node_modules
+/server/package-lock.json
+/server/uploads
+/server/logs

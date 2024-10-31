@@ -1,0 +1,305 @@
+const express = require('express');
+const app = express();
+const router = express.Router();
+const multer = require('multer');
+const Bull = require('bull');
+const fs = require('fs');
+const csv = require('csv-parser');
+const { Server } = require('socket.io');
+const http = require('http')
+const { v4: uuidv4 } = require('uuid');
+
+const {
+  successResponseGenerator,
+  httpErrorGenerator,
+  authUtils,
+  mailUtils,
+} = require('../../utils');
+
+const appResponse = require('../../utils/app-response');
+
+// const {
+//   passport
+// } = require('../middlewares');
+
+// const {
+//   validator: {
+//     checks: {
+//       CREDENTIALS,
+//       SIGNUP_CHECK,
+//       EMAIL_CHECK,
+//       PASSWORD_CHECK,
+//     },
+//     validateRequest,
+//   },
+// } = require('../middlewares');
+
+// const {
+//   HTTP_ERROR_MESSAGES,
+//   HTTP_SUCCESS_MESSAGES
+// } = require('../constants/messages');
+
+// const { PASSWORD_RESET_MAIL } = require('../constants/mail');
+const { taxi_trips }  = require('../../db/models');
+const { rbac } = require('../middlewares');
+const { ROLES } = require('../constants')
+
+const upload = multer({ dest: 'uploads/' });
+
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: '*' } });
+
+
+// Set up a Bull queue for processing CSV uploads
+const csvQueue = new Bull('csvUploadQueue');
+
+io.on('connection', (socket) => {
+  console.log('A user connected');
+  socket.on('disconnect', () => {
+      console.log('User disconnected');
+  });
+});
+
+// Monitor queue events
+csvQueue.on('completed', (job) => {
+  console.log(`Job ${job.id} Completed!`);
+  io.emit('jobCompleted', { jobId: job.id });
+});
+
+csvQueue.on('failed', (job, err) => {
+  console.log(`Job ${job.id} failed: ${err}`);
+  io.emit('jobFailed', { jobId: job.id, error: err });
+});
+
+// Job processing function
+csvQueue.process(async (job) => {
+  var results = [];
+  let rowsProcessed = 0;
+  let totalRows = 0;
+
+  
+  //total row count for calculating progress
+  // await new Promise((resolve) => {
+  //   fs.createReadStream(job.data.filePath)
+  //     .pipe(csv())
+  //     .on('data', () => totalRows++)
+  //     .on('end', resolve);
+  // });
+
+  fs.createReadStream(job.data.filePath)
+      .pipe(csv())
+      .on('data', (data) => {
+        results.push({
+          ...data,
+          id: uuidv4(),
+          user_id: '6d679b2c-cb23-442d-8729-648277605e84',
+        });
+        rowsProcessed++;
+
+        const progress = Math.round((rowsProcessed / totalRows) * 100);
+        io.to(job.id).emit('processingProgress', { jobId: job.id, progress });
+        // console.log(`Progress for job ${job.id}: ${progress}%`);
+      })
+      .on('end', async () => {
+          // Process and store the data in PostgreSQL
+          try {
+              // await IceCreamFavorites.bulkCreate(results);
+              // await TaxiTrip.bulkCreate(results);
+              console.log(results)
+              //Batch processing
+              // await taxi_trips.create(results[2]);
+
+              // const BATCH_SIZE = 1000;
+              // // async function insertTripsInBatches(tripsData) {
+                for (let i = 0; i < results.length; i++) {
+                  // const batch = results.slice(i, i + BATCH_SIZE);
+                  try {
+                    // await taxi_trips.create(results[i]);
+                    await taxi_trips.create(results[i]);
+
+                    console.log(`Inserted batch ${i}`);
+                  } catch (error) {
+                    console.error('Error inserting batch:', error);
+                  }
+                }
+              // }
+
+            //   console.log(`Processed ${results} records`);
+            //   return res.status(200).json(results)
+          } catch (error) {
+              console.error('Error storing data:', error);
+              throw new Error('Database storage error');
+            //   return res.status(500).json(createResponse({
+            //     returnCode: 1,
+            //     errorCode: 'SYSTEM_ERROR',
+            //     errorMessage: error.sqlMessage || error.message,
+            //     errorMeta: error.stack
+            // }));
+          } finally {
+              fs.unlinkSync(job.data.filePath);
+          }
+      });
+});
+
+/**
+ * @description Used to upload csv files;
+ * @param {String} password
+ */
+router.post('/upload',
+  // PASSWORD_CHECK,
+  // validateRequest,
+  // passport.authenticate('jwt', { session: false }),
+  // rbac.allowedRoles([ROLES.SUPER_ADMIN]),
+  upload.array('files', 10),
+  async (req, res, next) => {
+    try {
+      console.log(req.files)
+      if (!files) {
+        return res.status(400).send("No file uploaded");
+      }
+
+      if (file.mimetype !== 'text/csv') {
+        return res.status(400).send("Invalid file format. Please upload a CSV file.");
+      }
+
+      const jobs = req.files.map(file => csvQueue.add({ filePath: file.path}));
+      const jobIds = await Promise.all(jobs);
+
+      res.status(202).json(successResponseGenerator( {jobs:jobIds.map(job => job.id)} ,'File is being processed' ));
+
+    } catch (error) {
+      return res.status(500).json(createResponse({
+        returnCode: 1,
+        errorCode: 'SYSTEM_ERROR',
+        errorMessage: error.sqlMessage || error.message,
+        errorMeta: error.stack
+    }));
+   }
+});
+
+// Fetching datasets with filtering and pagination
+router.get('/', async (req, res) => {
+  try {
+    const { page = 1, limit = 10, ...filters } = req.query;
+
+    const whereClause = {};
+    if (filters.passenger_count) {
+      whereClause.passenger_count = filters.passenger_count;
+    }
+    if (filters.fare_amount) {
+      whereClause.fare_amount = { [Op.gte]: filters.fare_amount }; // Greater than or equal to
+    }
+    // Add more filters as needed
+
+    // Fetch data with pagination and filtering
+    const { count, rows } = await taxi_trips.findAndCountAll({
+      where: whereClause,
+      limit: parseInt(limit, 10),
+      offset: (page - 1) * limit,
+    });
+
+    // Respond with data and metadata
+    res.json({
+      totalPages: Math.ceil(count / limit),
+      currentPage: parseInt(page, 10),
+      data: rows,
+    });
+  } catch (err) {
+    console.error('Error fetching data:', err);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+// API to fetch a dataset by ID
+app.get('/:id', async (req, res) => {
+  try {
+    const dataset = await taxi_trips.findByPk(req.params.id);
+    if (!dataset) {
+      return res.status(404).json({ error: 'Dataset not found' });
+    }
+    res.json(dataset);
+  } catch (error) {
+    console.error('Error fetching dataset:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// API to update an existing dataset
+app.put('/update/:id', async (req, res) => {
+  try {
+    const dataset = await taxi_trips.findByPk(req.params.id);
+    if (!dataset) {
+      return res.status(404).json({ error: 'Dataset not found' });
+    }
+    await taxi_trips.update(req.body);
+    // broadcast([dataset]); // Broadcast the updated dataset to all clients
+    res.json(dataset);
+  } catch (error) {
+    console.error('Error updating dataset:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.delete('/delete/:id', async (req, res) => {
+  try {
+    const dataset = await taxi_trips.findByPk(req.params.id);
+    if (!dataset) {
+      return res.status(404).json({ error: 'Dataset not found' });
+    }
+    await dataset.destroy();
+    // Optionally broadcast the deletion
+    // broadcast([{ id: req.params.id }]); // Broadcast the deletion
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting dataset:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.post('/test',async(req,res) => {
+  try {
+    await taxi_trips.create(
+      {
+        id: uuidv4(),
+        user_id: '6d679b2c-cb23-442d-8729-648277605e84',
+        VendorID: '2',
+        tpep_pickup_datetime: '2024-02-01 00:28:54.000000',
+        tpep_dropoff_datetime: '2024-02-01 00:29:18.000000',
+        passenger_count: '1',
+        trip_distance: '0',
+        RatecodeID: '5',
+        store_and_fwd_flag: 'N',
+        PULocationID: '48',
+        DOLocationID: '48',
+        payment_type: '1',
+        fare_amount: '19.99',
+        extra: '0',
+        mta_tax: '0',
+        tip_amount: '0',
+        tolls_amount: '0',
+        improvement_surcharge: '1',
+        total_amount: '23.49',
+        congestion_surcharge: '2.5',
+        Airport_fee: '0'
+      },
+    )
+    
+    res.status(200).send('success')
+  } catch (error) {
+    res.status(400).json(error)
+  }
+})
+
+ function createResponse(info) {
+  return appResponse.createResponse({
+      data: info.data,
+      returnCode: info.returnCode || 0,
+      error: {
+          message: info.errorMessage,
+          code: info.errorCode,
+          meta: info.errorMeta
+      }
+  });
+}
+
+module.exports = router;
