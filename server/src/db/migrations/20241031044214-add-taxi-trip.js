@@ -19,7 +19,7 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      VendorID: {
+      vendor_id: {
         type: Sequelize.STRING,
         allowNull: true,
       },
@@ -39,7 +39,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
-      RatecodeID: {
+      ratecode_id: {
         type: Sequelize.STRING,
         allowNull: true
       },
@@ -47,11 +47,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
-      PULocationID: {
+      pu_location_id: {
         type: Sequelize.STRING,
         allowNull: true
       },
-      DOLocationID: {
+      do_location_id: {
         type: Sequelize.STRING,
         allowNull: true
       },
@@ -91,7 +91,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
-      Airport_fee: {
+      airport_fee: {
         type: Sequelize.STRING,
         allowNull: true
       },

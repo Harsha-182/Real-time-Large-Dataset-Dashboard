@@ -40,7 +40,7 @@ const appResponse = require('../../utils/app-response');
 // } = require('../constants/messages');
 
 // const { PASSWORD_RESET_MAIL } = require('../constants/mail');
-const { taxi_trips }  = require('../../db/models');
+const { TaxiTrip }  = require('../../db/models');
 const { rbac } = require('../middlewares');
 const { ROLES } = require('../constants')
 
@@ -92,9 +92,28 @@ csvQueue.process(async (job) => {
       .pipe(csv())
       .on('data', (data) => {
         results.push({
-          ...data,
+          // ...data,
           // id: uuidv4(),
-          user_id: 'b77b7a11-6605-4718-89a0-10d77cbfb390',
+          user_id: '577b55a1-0704-4270-af47-729512f49033',
+          vendor_id: data.VendorID,
+          tpep_pickup_datetime: data.tpep_pickup_datetime? data.tpep_pickup_datetime:'',
+          tpep_dropoff_datetime: data.tpep_dropoff_datetime? data.tpep_dropoff_datetime:'',
+          passenger_count: data.passenger_count? data.passenger_count:'',
+          trip_distance: data.trip_distance? data.trip_distance:'',
+          ratecode_id: data.RatecodeID? data.RatecodeID:'',
+          store_and_fwd_flag: data.store_and_fwd_flag? data.store_and_fwd_flag:'',
+          pu_location_id: data.PULocationID? data.PULocationID:'',
+          do_location_id: data.DOLocationID? data.DOLocationID:'',
+          payment_type: data.payment_type? data.payment_type:'',
+          fare_amount: data.fare_amount? data.fare_amount:'',
+          extra: data.extra? data.extra:'',
+          mta_tax: data.mta_tax? data.mta_tax:'',
+          tip_amount: data.tip_amount? data.tip_amount:'',
+          tolls_amount: data.tolls_amount? data.tolls_amount:'',
+          improvement_surcharge: data.improvement_surcharge? data.improvement_surcharge:'',
+          total_amount: data.total_amount? data.total_amount:'',
+          congestion_surcharge: data.congestion_surcharge? data.congestion_surcharge:'',
+          airport_fee: data.Airport_fee? data.Airport_fee:''
         });
         rowsProcessed++;
 
@@ -109,7 +128,7 @@ csvQueue.process(async (job) => {
               // await TaxiTrip.bulkCreate(results);
               console.log(results)
               //Batch processing
-              // await taxi_trips.create(results[2]);
+              // await TaxiTrip.create(results[2]);
 
               const BATCH_SIZE = 200000;
               console.log("Bulk Creation started")
@@ -117,8 +136,8 @@ csvQueue.process(async (job) => {
                 for (let i = 0; i < results.length; i+= BATCH_SIZE) {
                   const batch = results.slice(i, i + BATCH_SIZE);
                   try {
-                    // await taxi_trips.create(results[i]);
-                    await taxi_trips.bulkCreate(batch)
+                    // await TaxiTrip.create(results[i]);
+                    await TaxiTrip.bulkCreate(batch)
                     .then(() => {
                       // console.log("Trips have been added successfully!");
                     })
@@ -205,7 +224,7 @@ router.get('/', async (req, res) => {
     // Add more filters as needed
 
     // Fetch data with pagination and filtering
-    const { count, rows } = await taxi_trips.findAndCountAll({
+    const { count, rows } = await TaxiTrip.findAndCountAll({
       where: whereClause,
       limit: parseInt(limit, 10),
       offset: (page - 1) * limit,
@@ -226,7 +245,7 @@ router.get('/', async (req, res) => {
 // API to fetch a dataset by ID
 app.get('/:id', async (req, res) => {
   try {
-    const dataset = await taxi_trips.findByPk(req.params.id);
+    const dataset = await TaxiTrip.findByPk(req.params.id);
     if (!dataset) {
       return res.status(404).json({ error: 'Dataset not found' });
     }
@@ -240,11 +259,11 @@ app.get('/:id', async (req, res) => {
 // API to update an existing dataset
 app.put('/update/:id', async (req, res) => {
   try {
-    const dataset = await taxi_trips.findByPk(req.params.id);
+    const dataset = await TaxiTrip.findByPk(req.params.id);
     if (!dataset) {
       return res.status(404).json({ error: 'Dataset not found' });
     }
-    await taxi_trips.update(req.body);
+    await TaxiTrip.update(req.body);
     // broadcast([dataset]); // Broadcast the updated dataset to all clients
     res.json(dataset);
   } catch (error) {
@@ -255,7 +274,7 @@ app.put('/update/:id', async (req, res) => {
 
 app.delete('/delete/:id', async (req, res) => {
   try {
-    const dataset = await taxi_trips.findByPk(req.params.id);
+    const dataset = await TaxiTrip.findByPk(req.params.id);
     if (!dataset) {
       return res.status(404).json({ error: 'Dataset not found' });
     }
@@ -271,19 +290,19 @@ app.delete('/delete/:id', async (req, res) => {
 
 router.post('/test',async(req,res) => {
   try {
-    await taxi_trips.create(
+    await TaxiTrip.create(
       {
         // id: uuidv4(),
-        user_id: 'b77b7a11-6605-4718-89a0-10d77cbfb390',
-        VendorID: '2',
+        user_id: '577b55a1-0704-4270-af47-729512f49033',
+        vendor_id: '2',
         tpep_pickup_datetime: '2024-02-01 00:28:54.000000',
         tpep_dropoff_datetime: '2024-02-01 00:29:18.000000',
         passenger_count: '1',
         trip_distance: '0',
-        RatecodeID: '5',
+        ratecode_id: '5',
         store_and_fwd_flag: 'N',
-        PULocationID: '48',
-        DOLocationID: '48',
+        pu_location_id: '48',
+        do_location_id: '48',
         payment_type: '1',
         fare_amount: '19.99',
         extra: '0',
@@ -293,7 +312,7 @@ router.post('/test',async(req,res) => {
         improvement_surcharge: '1',
         total_amount: '23.49',
         congestion_surcharge: '2.5',
-        Airport_fee: '0'
+        airport_fee: '0'
       },
     )
     

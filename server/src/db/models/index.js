@@ -16,7 +16,7 @@ const options = {
     underscoredAll: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
-    freezeTableName: true,
+    // freezeTableName: true,
   },
 };
 let sequelize;

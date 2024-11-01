@@ -14,9 +14,9 @@ const {
 
   module.exports = (sequelize, DataTypes) => {
     class User extends Model {
-        static associate({ Credential, taxi_trips }) {
+        static associate({ Credential, TaxiTrip }) {
           User.hasOne(Credential);
-          User.hasMany(taxi_trips);
+          User.hasMany(TaxiTrip);
         }
       }
     User.init({
@@ -32,9 +32,6 @@ const {
       last_name: {
         type: DataTypes.STRING,
         allowNull: false,
-      },
-      stockdata_id: {
-        type: DataTypes.UUID,
       },
       updated_by_id: {
         type: DataTypes.STRING,

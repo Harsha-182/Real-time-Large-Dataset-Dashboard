@@ -3,12 +3,12 @@ const {
 } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-   class taxi_trips extends Model {
+   class TaxiTrip extends Model {
        static associate({ User }) {
-        taxi_trips.belongsTo(User)
+        TaxiTrip.belongsTo(User)
       }
    }
-   taxi_trips.init({
+   TaxiTrip.init({
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4, 
@@ -18,10 +18,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.UUID,
       allowNull: false,
     },
-    VendorID: {
+    vendor_id: {
       type: DataTypes.STRING,
       allowNull: true,
-      field:'VendorID'
+      // field:'vender_id'
     },
     tpep_pickup_datetime: {
       type: DataTypes.STRING,
@@ -39,24 +39,24 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    RatecodeID: {
+    ratecode_id: {
       type: DataTypes.STRING,
       allowNull: true,
-      field:'RatecodeID'
+      // field:'ratecode_id'
     },
     store_and_fwd_flag: {
       type: DataTypes.STRING,
       allowNull: true
     },
-    PULocationID: {
+    pu_location_id: {
       type: DataTypes.STRING,
       allowNull: true,
-      field: 'PULocationID'
+      // field: 'pu_location_id'
     },
-    DOLocationID: {
+    do_location_id: {
       type: DataTypes.STRING,
       allowNull: true,
-      field:'DOLocationID'
+      // field:'do_location_id'
     },
     payment_type: {
       type: DataTypes.STRING,
@@ -94,16 +94,16 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true
     },
-    Airport_fee: {
+    airport_fee: {
       type: DataTypes.STRING,
       allowNull: true,
-      field: 'Airport_fee'
+      // field: 'airport_fee'
     },
    }, {
     sequelize,
-    modelName: 'taxi_trips',
+    modelName: 'TaxiTrip',
   });
 
-  return taxi_trips;
+  return TaxiTrip;
 
 };

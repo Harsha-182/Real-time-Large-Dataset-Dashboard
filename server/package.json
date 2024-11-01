@@ -4,8 +4,8 @@
   "description": "Nodejs File Structure for reference",
   "main": "app.js",
   "scripts": {
-    "start": "--max-old-space-size=8192 node ./src/bin/www",
-    "dev": "--max-old-space-size=8192 nodemon ./src/bin/www"
+    "start": "node ./src/bin/www",
+    "dev": "node ./src/bin/www"
   },
   "author": "Celestial Systems (Nodejs)",
   "license": "ISC",
