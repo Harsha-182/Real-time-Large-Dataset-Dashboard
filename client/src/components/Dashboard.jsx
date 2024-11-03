@@ -6,6 +6,7 @@ import UnauthorizedModal from './UnAuthorizedModal';
 import MainGrid from './MainGrid';
 import AddUser from './Users/AddUser';
 import UnknownPage from './UnknownPage';
+import UserMainBoard from './UserMainBoard';
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -16,7 +17,7 @@ const Dashboard = () => {
 
 
     const adminAccess = ['/dashboard/', '/dashboard/admin/adduser'];
-    const userAccess = ['/dashboard/', '/dashboard/viewtask'];
+    const userAccess = ['/dashboard/user/'];
 
     const preferredLocation = (role) => {
         if(role === 'super-admin' && adminAccess.includes(requestedUrl)) {
@@ -25,11 +26,10 @@ const Dashboard = () => {
             navigate(requestedUrl);
         } else if(role === 'user' && userAccess.includes(requestedUrl)) {
             navigate(requestedUrl);
+        } else {
+            setShowUnauthorizedModal(true);
+            setMessage('You do not have access to this page.')
         }
-        //  else {
-            // setShowUnauthorizedModal(true);
-            // setMessage('You do not have access to this page.')
-        // }
     }
 
     const sideNavItems = 
@@ -66,6 +66,7 @@ const Dashboard = () => {
                     >
                     <Route exact path="/" Component={MainGrid} />
                     <Route path="/admin/adduser" Component={AddUser}/>
+                    <Route path="/user/" Component={UserMainBoard}/>
                     <Route path="/*" Component={UnknownPage}/>
                 </Route>
             </Routes>

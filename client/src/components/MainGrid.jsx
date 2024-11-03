@@ -1,8 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { listTrips } from './actions/TaxiTrip/listTrips';
-import { filterTrip } from './actions/TaxiTrip/filterTrips';
 
+import { toast, ToastContainer } from 'react-toastify';
+import { Line, Bar, Scatter, Pie } from 'react-chartjs-2';
+import 'react-toastify/dist/ReactToastify.css';
+import io from 'socket.io-client';
+import axios from 'axios';
 import {
   Box,
   Paper,
@@ -22,7 +25,6 @@ import {
   TableCell,
   Pagination,
 } from '@mui/material';
-import { Line, Bar, Scatter, Pie } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   LineElement,
@@ -34,21 +36,17 @@ import {
   Legend,
   ArcElement,
 } from 'chart.js';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import io from 'socket.io-client';
-import axios from 'axios';
+import { listTrips } from './actions/TaxiTrip/listTrips';
+import { filterTrip } from './actions/TaxiTrip/filterTrips';
 
 ChartJS.register(LineElement, BarElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend, ArcElement);
 
-// const socket = io('http://localhost:4000'); // Adjust the URL to your backend server
 const socket = io('http://localhost:5000', {
     autoConnect: false
 });
 
-const App = () => {
+const MainGrid = () => {
   const taxiData = useSelector((state) => state.TaxiTrip);
-  // console.log("taxiData=========", taxiData1);
   const filterTripStatus = useSelector((state) => state.FilterTrip);  
   const dispatch = useDispatch();
 
@@ -56,42 +54,31 @@ const App = () => {
   const [endDate, setEndDate] = useState();
   const [passengerCount, setPassengerCount] = useState();
   const [page, setPage] = useState(1);
-  const [pieChartField, setPieChartField] = useState('pu_location_id'); // New state for pie chart field selection
+  const [pieChartField, setPieChartField] = useState('pu_location_id');
   const [fareAmount, setFareAmount] = useState();
   const [startRange, setStartRange] = useState();
   const [endRange, setEndRange] = useState();
   const [timeRange, setTimeRange] = useState();
   const [csvFile, setCsvFile] = useState(null);
 
-  // console.log("filterTrip======", filterTripStatus)
   useEffect(() => {
     dispatch(listTrips({page, startDate, endDate, passengerCount, fareAmount}));
   }, [page, startDate, endDate, passengerCount, fareAmount]);
-
-  // useEffect(() => {
-  //   if (taxiData1 && taxiData1.status === 'success') {
-  //     // setTaxiData(taxiData1);
-  //   }
-  // }, [taxiData1]);
 
   useEffect(() => {
     dispatch(filterTrip({startRange, endRange, timeRange}));
   },[startRange, endRange, timeRange])
   
-  useEffect(() => {
-    // Connect to socket and listen for events
-    socket.on('jobCompleted', (data) => {
-      // Display dynamic toast notifications
-      toast.info(`New data received: ${data}`);
-      console.log("new Data arrived==========================================================================================================================")
-      dispatch(listTrips());  // Optionally trigger data fetch if new data arrives
-    });
+  // useEffect(() => {
+  //   socket.on('jobCompleted', (data) => {
+  //     toast.info(`New data received: ${data}`);
+  //     dispatch(listTrips());
+  //   });
 
-    // Cleanup on unmount
-    return () => {
-      socket.off('jobCompleted');
-    };
-  }, []);
+  //   return () => {
+  //     socket.off('jobCompleted');
+  //   };
+  // }, []);
 
   const handleFileChange = (event) => {
     setCsvFile(event.target.files[0]);
@@ -111,17 +98,6 @@ const App = () => {
       toast.error(error.response?.data?.message || "Failed to upload file");
     }
   };
-
-  // Filtering data based on selected filters
-  const filteredData = taxiData?.data?.data.filter(trip => {
-    const pickupDate = new Date(trip.tpep_pickup_datetime);
-    const dropoffDate = new Date(trip.tpep_dropoff_datetime);
-    return (
-      (!startDate || pickupDate >= new Date(startDate)) &&
-      (!endDate || dropoffDate <= new Date(endDate)) &&
-      (!passengerCount || trip.passenger_count === passengerCount)
-    );
-  });
 
   const handlePageChange = (event, value) => setPage(value);
 
@@ -146,7 +122,6 @@ const App = () => {
     };
   }, [taxiData?.data?.data, pieChartField]);
 
-  // Example chart data and configuration for different charts
   const lineChartData = {
     labels: filterTripStatus?.data && filterTripStatus.data.map(trip => new Date(trip.time_period).toLocaleDateString()),
     datasets: [
@@ -184,9 +159,7 @@ const App = () => {
   };
 
   return (
-    <Box p={3}>
-      {/* <Typography variant="h4" align="center" gutterBottom>NYC Taxi Trip Data Dashboard</Typography> */}
-      
+    <Box p={3}>      
       <ToastContainer />
 
       <Box mb={2} display="flex" justifyContent="end">
@@ -397,4 +370,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default MainGrid;

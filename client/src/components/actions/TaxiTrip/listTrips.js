@@ -33,7 +33,6 @@ export function listTrips(
           timeout: 40000,
         });
 
-        console.log("response=taxitrip===", response.data);
         dispatch({ type: 'TAXI_TRIP_SUCCESS', payload: response.data });
       } catch (error) {
         dispatch({

@@ -23,14 +23,21 @@ function Appbar(props) {
   const navigate = useNavigate();
   
   const routeChoice = (text) => {
-    return (
-      text === 'Dashboard' ?
-        '/dashboard/' :
-        text === 'Users'?
-          '/dashboard/admin/adduser':
-
-            `/dashboard/${text.replace(' ', '').toLowerCase()}`
-    )
+    if(role === 'super-admin'){
+      return (
+        text === 'Dashboard' ?
+          '/dashboard/' :
+          text === 'Users'?
+            '/dashboard/admin/adduser':
+              `/dashboard/${text.replace(' ', '').toLowerCase()}`
+      )
+    } else if(role === 'user'){
+      return (
+        text === 'Dashboard' ?
+          '/dashboard/user/' :
+              `/dashboard/${text.replace(' ', '').toLowerCase()}`
+      )
+    }
   }
 
   const handleLogout = () => {
@@ -72,7 +79,7 @@ function Appbar(props) {
             {items.map((text, index) => {
               const route = routeChoice(text, role)
               return(
-                <ListItem key={text} disablePadding>
+                <ListItem key={text}>
                   <ListItemButton component={Link} to={route}>
                     <ListItemIcon>
                       {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}

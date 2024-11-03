@@ -53,7 +53,7 @@ const AddUser = () => {
         }
     }, [success]);
 
-    const roles = ['admin', 'user'];
+    const roles = ['super-admin', 'user'];
 
     const handleChange = (e) => {
         const { name, value } = e.target;

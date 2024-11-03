@@ -31,7 +31,6 @@ export function login(formData = {}) {
                     (response) => {
                         const { accessToken, userInfo} = response.data;
                         const { role } = response.data.userInfo;
-                        console.log("response====",userInfo)
     
                         localStorage.setItem('authToken', accessToken);
                         localStorage.setItem('userRole', role);
