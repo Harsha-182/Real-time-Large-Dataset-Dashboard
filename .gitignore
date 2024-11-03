@@ -3,3 +3,4 @@
 /server/package-lock.json
 /server/uploads
 /server/logs
+/server/.env
