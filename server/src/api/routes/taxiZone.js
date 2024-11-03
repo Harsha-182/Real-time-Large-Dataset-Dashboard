@@ -5,7 +5,6 @@ const multer = require('multer');
 const Bull = require('bull');
 const fs = require('fs');
 const csv = require('csv-parser');
-const { v4: uuidv4 } = require('uuid');
 const Sequelize = require('sequelize');
 const redis = require('redis');
 
@@ -13,39 +12,10 @@ const { Op } = Sequelize;
 
 const {
   successResponseGenerator,
-  httpErrorGenerator,
-  authUtils,
-  mailUtils,
 } = require('../../utils');
 
 const appResponse = require('../../utils/app-response');
-
-// const {
-//   passport
-// } = require('../middlewares');
-
-// const {
-//   validator: {
-//     checks: {
-//       CREDENTIALS,
-//       SIGNUP_CHECK,
-//       EMAIL_CHECK,
-//       PASSWORD_CHECK,
-//     },
-//     validateRequest,
-//   },
-// } = require('../middlewares');
-
-// const {
-//   HTTP_ERROR_MESSAGES,
-//   HTTP_SUCCESS_MESSAGES
-// } = require('../constants/messages');
-
-// const { PASSWORD_RESET_MAIL } = require('../constants/mail');
 const { TaxiTrip }  = require('../../db/models');
-const { rbac } = require('../middlewares');
-const { ROLES } = require('../constants');
-
 const socketIO = require('socket.io');
 const http = require('http');
 
@@ -59,10 +29,8 @@ const io =socketIO(server, {
   }
 })
 
-// Set up a Bull queue for processing CSV uploads
 const csvQueue = new Bull('csvUploadQueue');
 
-// Redis client setup
 const redisClient = redis.createClient({ url: 'redis://localhost:6379' });
 redisClient.connect();
 
@@ -85,17 +53,6 @@ csvQueue.process(async (job) => {
   var results = [];
   let rowsProcessed = 0;
   let totalRows = 0;
-
-  
-  // total row count for calculating progress
-  // await new Promise((resolve) => {
-  //   fs.createReadStream(job.data.filePath)
-  //     .pipe(csv())
-  //     .on('data', () => totalRows++)
-  //     .on('end', resolve);
-  // });
-
-  // console.log("totalRows======",totalRows)
 
   fs.createReadStream(job.data.filePath)
       .pipe(csv())
@@ -125,54 +82,29 @@ csvQueue.process(async (job) => {
           airport_fee: data.Airport_fee
         });
         rowsProcessed++;
-
-        // const progress = Math.round((rowsProcessed / totalRows) * 100);
-        // io.to(job.id).emit('process  ingProgress', { jobId: job.id, progress });
-        // console.log(`Progress for job ${job.id}: ${progress}%`);
       })
       .on('end', async () => {
           // Process and store the data in PostgreSQL
           try {
-              // await IceCreamFavorites.bulkCreate(results);
-              // await TaxiTrip.bulkCreate(results);
-              console.log(results)
-              //Batch processing
-              // await TaxiTrip.create(results[2]);
-
               const BATCH_SIZE = 200000;
-              console.log("Bulk Creation started")
-              // // async function insertTripsInBatches(tripsData) {
                 for (let i = 0; i < results.length; i+= BATCH_SIZE) {
                   const batch = results.slice(i, i + BATCH_SIZE);
                   try {
-                    // await TaxiTrip.create(results[i]);
                     await TaxiTrip.bulkCreate(batch)
                     .then(() => {
-                      // console.log("Trips have been added successfully!");
                     })
                     .catch((error) => {
                       console.error("Error in bulk creation:", error);
-                      // throw new Error('Error in bulk creation:');
+                      throw new Error(error);
                     });
 
-                    console.log(`Inserted batch ${i}`);
                   } catch (error) {
                     console.error('Error inserting batch:', error);
+                    throw new Error(error);
                   }
                 }
-              // }
-
-            //   console.log(`Processed ${results} records`);
-            //   return res.status(200).json(results)
           } catch (error) {
-              console.error('Error storing data:', error);
               throw new Error('Database storage error');
-            //   return res.status(500).json(createResponse({
-            //     returnCode: 1,
-            //     errorCode: 'SYSTEM_ERROR',
-            //     errorMessage: error.sqlMessage || error.message,
-            //     errorMeta: error.stack
-            // }));
           } finally {
               fs.unlinkSync(job.data.filePath);
           }
@@ -202,9 +134,6 @@ router.post('/upload',
         return res.status(400).send("Invalid file format. Please upload a CSV file.");
       }
 
-      // const jobs = req.files.map(file => csvQueue.add({ filePath: file.path}));
-      // const jobIds = await Promise.all(jobs);
-
       const jobId = csvQueue.add({ filePath: file.path})
 
       res.status(202).json(successResponseGenerator( {jobs:jobId},'File is being processed' ));
@@ -230,19 +159,16 @@ router.post('/upload',
 router.get('/get', async (req, res) => {
   try {
     const {
-      page = 1,  // default to page 1 if undefined
+      page = 1,
       limit = 10,
-      startDate = null,  // set to null if not provided
+      startDate = null,
       endDate = null,
       passengerCount = null,
       fareAmount = null,
     } = req.query;
 
-    console.log("query=============")
-    console.log(req.query)
     const whereClause = {};
     if (passengerCount) {
-      console.log("inside passenger")
       whereClause.passenger_count = passengerCount;
     }
     if (fareAmount) {
@@ -257,18 +183,12 @@ router.get('/get', async (req, res) => {
       whereClause.tpep_dropoff_datetime = { [Op.lte]: new Date(endDate) };
     }
 
-    // Add more filters as needed
-
-    // Fetch data with pagination and filtering
-    console.log("where===", whereClause)
     const { count, rows } = await TaxiTrip.findAndCountAll({
       where: whereClause,
       limit: parseInt(limit, 10),
       offset: (page - 1) * limit,
     });
 
-    // console.log("rows",rows)
-    // Respond with data and metadata
     res.json({
       totalPages: Math.ceil(count / limit),
       currentPage: parseInt(page, 10),
@@ -302,7 +222,6 @@ app.put('/update/:id', async (req, res) => {
       return res.status(404).json({ error: 'Dataset not found' });
     }
     await TaxiTrip.update(req.body);
-    // broadcast([dataset]); // Broadcast the updated dataset to all clients
     res.json(dataset);
   } catch (error) {
     console.error('Error updating dataset:', error);
@@ -317,8 +236,6 @@ app.delete('/delete/:id', async (req, res) => {
       return res.status(404).json({ error: 'Dataset not found' });
     }
     await dataset.destroy();
-    // Optionally broadcast the deletion
-    // broadcast([{ id: req.params.id }]); // Broadcast the deletion
     res.status(204).send();
   } catch (error) {
     console.error('Error deleting dataset:', error);
@@ -403,11 +320,10 @@ router.get('/trips/aggregate', async (req, res) => {
       return res.json(JSON.parse(cachedData)); // Send cached response
     }
 
-    // Define a default date range for the current year if no date range is provided
     if (!startDate && !endDate) {
       const currentYear = new Date().getFullYear();
-      startDate = new Date(currentYear, 0, 1); // January 1st of the current year
-      endDate = new Date(currentYear, 11, 31); // December 31st of the current year
+      startDate = new Date(currentYear, 0, 1); 
+      endDate = new Date(currentYear, 11, 31);
     }
 
     // Query the data

@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 const process = require('process');
+require('dotenv').config();
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
 const config = require('../../config/db.js')[env];
@@ -21,7 +22,16 @@ const options = {
 };
 let sequelize;
 if (options.use_env_variable) {
-  sequelize = new Sequelize(process.env[options.use_env_variable], options);
+  sequelize = new Sequelize(process.env.POSTGRES_URL, {
+    dialect: 'postgres',
+    protocol: 'postgres',
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false, // Adjust if necessary based on your provider
+      },
+    },
+    logging: false,});
 } else {
   sequelize = new Sequelize(options.database, options.username, options.password, options);
 }
