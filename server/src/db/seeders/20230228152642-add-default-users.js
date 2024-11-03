@@ -10,6 +10,7 @@ module.exports = {
         email: 'test1@celestialsys.com',
         first_name: 'Test',
         last_name: 'user1',
+        role: 'super-admin',
         created_at: new Date(),
         updated_at: new Date(),
       }]);

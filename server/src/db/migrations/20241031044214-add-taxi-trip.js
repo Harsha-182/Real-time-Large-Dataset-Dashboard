@@ -24,15 +24,15 @@ module.exports = {
         allowNull: true,
       },
       tpep_pickup_datetime: {
-        type: Sequelize.STRING,
+        type: Sequelize.DATE,
         allowNull: false
       },
       tpep_dropoff_datetime: {
-        type: Sequelize.STRING,
+        type: Sequelize.DATE,
         allowNull: false
       },
       passenger_count: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       trip_distance: {
@@ -60,7 +60,7 @@ module.exports = {
         allowNull: true
       },
       fare_amount: {
-        type: Sequelize.STRING,
+        type: Sequelize.FLOAT,
         allowNull: true
       },
       extra: {

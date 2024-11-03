@@ -33,6 +33,10 @@ const {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      role: {
+        type: DataTypes.ENUM('super-admin', 'manager', 'user'),
+        allowNull: false,
+      },
       updated_by_id: {
         type: DataTypes.STRING,
       },

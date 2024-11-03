@@ -16,13 +16,14 @@ const { v4: uuidv4 } = require('uuid');
 
 
 const createUserWithCredentials = async ({
-  email, first_name, last_name, roleId, password
+  email, first_name, last_name, role, password
 }) => {
   const userDetails = {
     email,
     first_name,
     last_name,
     password,
+    role,
     // role_id: roleId,
   };
   // if (!roleId) {
@@ -61,7 +62,7 @@ const checkIfUserExists = async (query) => User.findOne({
   where: {
     ...query,
   },
-  attributes: ['id', 'first_name', 'last_name', 'email'],
+  attributes: ['id', 'first_name', 'last_name', 'email', 'role'],
 
 });
 

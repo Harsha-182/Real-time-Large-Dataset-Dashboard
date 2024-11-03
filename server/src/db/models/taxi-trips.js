@@ -21,18 +21,17 @@ module.exports = (sequelize, DataTypes) => {
     vendor_id: {
       type: DataTypes.STRING,
       allowNull: true,
-      // field:'vender_id'
     },
     tpep_pickup_datetime: {
-      type: DataTypes.STRING,
+      type: DataTypes.DATE,
       allowNull: false
     },
     tpep_dropoff_datetime: {
-      type: DataTypes.STRING,
+      type: DataTypes.DATE,
       allowNull: false
     },
     passenger_count: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: true
     },
     trip_distance: {
@@ -42,7 +41,6 @@ module.exports = (sequelize, DataTypes) => {
     ratecode_id: {
       type: DataTypes.STRING,
       allowNull: true,
-      // field:'ratecode_id'
     },
     store_and_fwd_flag: {
       type: DataTypes.STRING,
@@ -51,19 +49,17 @@ module.exports = (sequelize, DataTypes) => {
     pu_location_id: {
       type: DataTypes.STRING,
       allowNull: true,
-      // field: 'pu_location_id'
     },
     do_location_id: {
       type: DataTypes.STRING,
       allowNull: true,
-      // field:'do_location_id'
     },
     payment_type: {
       type: DataTypes.STRING,
       allowNull: true
     },
     fare_amount: {
-      type: DataTypes.STRING,
+      type: DataTypes.FLOAT,
       allowNull: true
     },
     extra: {
@@ -97,7 +93,6 @@ module.exports = (sequelize, DataTypes) => {
     airport_fee: {
       type: DataTypes.STRING,
       allowNull: true,
-      // field: 'airport_fee'
     },
    }, {
     sequelize,
