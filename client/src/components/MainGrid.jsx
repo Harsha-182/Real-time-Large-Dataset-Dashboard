@@ -352,7 +352,7 @@ const MainGrid = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {taxiData.data && taxiData?.data?.data?.map((trip, index) => (
+            {taxiData?.data ? taxiData.data && taxiData?.data?.data?.map((trip, index) => (
               <TableRow key={index}>
                 <TableCell>{new Date(trip.tpep_pickup_datetime).toLocaleString()}</TableCell>
                 <TableCell>{new Date(trip.tpep_dropoff_datetime).toLocaleString()}</TableCell>
@@ -361,7 +361,9 @@ const MainGrid = () => {
                 <TableCell>{trip.passenger_count}</TableCell>
                 <TableCell>${trip.fare_amount}</TableCell>
               </TableRow>
-            ))}
+            )):
+             <Typography>No Data</Typography>
+            }
           </TableBody>
         </Table>
       </TableContainer>
