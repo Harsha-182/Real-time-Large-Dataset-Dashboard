@@ -60,7 +60,7 @@ csvQueue.process(async (job) => {
         results.push({
           // ...data,
           // id: uuidv4(),
-          user_id: '3fded512-00cd-4171-96bb-8daf22b8f98d',
+          user_id: '31327399-b4dc-48d0-9574-b872def977bf',
           vendor_id: data.VendorID,
           tpep_pickup_datetime: new Date(data.tpep_pickup_datetime),
           tpep_dropoff_datetime: new Date(data.tpep_dropoff_datetime),
@@ -86,11 +86,13 @@ csvQueue.process(async (job) => {
       .on('end', async () => {
           // Process and store the data in PostgreSQL
           try {
+              console.log("Batch Processing")
               const BATCH_SIZE = 200000;
                 for (let i = 0; i < results.length; i+= BATCH_SIZE) {
                   const batch = results.slice(i, i + BATCH_SIZE);
                   try {
                     await TaxiTrip.bulkCreate(batch)
+                    console.log("Batch Inserted ", i)
                     .then(() => {
                     })
                     .catch((error) => {

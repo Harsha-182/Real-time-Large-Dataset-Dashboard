@@ -30,7 +30,6 @@ export const deleteTask = (index) => {
   return (dispatch, getState) => {
     const { tasks } = getState().Task;
     const updatedTasks = tasks.filter((_, i) => {
-      console.log("i===",i,"index",index)
       return i !== index
     });
     localStorage.setItem('tasks', JSON.stringify(updatedTasks));

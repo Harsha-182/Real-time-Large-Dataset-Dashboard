@@ -23,56 +23,25 @@ const options = {
 };
 let sequelize;
 if (options.use_env_variable) {
-  sequelize = new Sequelize(process.env.POSTGRES_URL, {
-    dialect: 'postgres',
-    protocol: 'postgres',
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false, // Adjust if necessary based on your provider
-      },
-    },
-    logging: false,});
+  sequelize = new Sequelize(process.env[options.use_env_variable], options);
 } else {
-  sequelize = new Sequelize(process.env.POSTGRES_URL, {
-    dialect: 'postgres',
-    protocol: 'postgres',
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false,
-      },
-    },
-    logging: false,});
+  sequelize = new Sequelize(options.database, options.username, options.password, options);
 }
 
 const runMigrations = async () => {
   const umzug = new Umzug({
-    migrations: { glob: 'migrations/*.js' },
+    migrations: { glob: 'src/db/migrations/*.js' },
     storage: new SequelizeStorage({ sequelize }),
     context: sequelize.getQueryInterface(),
     logger: console,
   });
 
+  console.log("umug==========")
+  console.log(umzug)
+
   // Run migrations if there are any pending
   await umzug.up();
 };
-
-(async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('Connection to PostgreSQL has been established successfully.');
-
-    // Run migrations
-    await runMigrations();
-    console.log('Migrations completed.');
-
-    // Your app's main code here
-
-  } catch (error) {
-    console.error('Unable to connect to the database or run migrations:', error);
-  }
-})();
 
 fs
   .readdirSync(__dirname)
@@ -89,6 +58,23 @@ Object.keys(db).forEach(modelName => {
     db[modelName].associate(db);
   }
 });
+
+(async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('Connection to PostgreSQL has been established successfully.');
+
+    // Run migrations
+    await runMigrations();
+    console.log('Migrations completed.');
+
+    // Your app's main code here
+
+  } catch (error) {
+    console.error('Unable to connect to the database or run migrations:', error);
+  }
+})
+
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
