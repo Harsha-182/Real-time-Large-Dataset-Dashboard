@@ -18,7 +18,7 @@ export function login(formData = {}) {
                 axios.request({
                     url: request.url,
                     method: request.method || 'post',
-                    baseURL: 'https://real-time-large-dataset-dashboard-ojk3.vercel.app/',
+                    baseURL: 'real-time-large-dataset-dashboard-ojk3-k4iyxf8t0.vercel.app',
                     headers: {
                         ...{
                             'Content-Type': 'application/json',
