@@ -16,7 +16,7 @@ const corsOptions = {
   credentials: true,  // if you're using cookies or authentication
 };
 
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
