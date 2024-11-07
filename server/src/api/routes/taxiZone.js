@@ -60,7 +60,7 @@ csvQueue.process(async (job) => {
         results.push({
           // ...data,
           // id: uuidv4(),
-          user_id: '3fded512-00cd-4171-96bb-8daf22b8f98d',
+          user_id: 'cadb1208-201f-4918-828a-835082234aa6',
           vendor_id: data.VendorID,
           tpep_pickup_datetime: new Date(data.tpep_pickup_datetime),
           tpep_dropoff_datetime: new Date(data.tpep_dropoff_datetime),

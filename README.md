@@ -55,8 +55,7 @@ Example:
 - **Database**: MongoDB/PostgreSQL
 - **Frontend**: React, Next.js, Chart.js/D3.js
 - **Real-Time**: WebSockets/SSE
-- **Deployment**: AWS (EC2/Lambda), Vercel
-- **CI/CD**: GitHub Actions
+- **Deployment**: Vercel
 
 ---
 
@@ -82,13 +81,11 @@ Example:
 3. **Set Up Environment Variables**:
    - Backend `.env` example:
      ```plaintext
-     DB_CONNECTION=mongodb://localhost:27017/your-db
-     JWT_SECRET=your_jwt_secret
      REDIS_URL=redis://localhost:6379
      ```
    - Frontend `.env` example:
      ```plaintext
-     NEXT_PUBLIC_API_URL=http://localhost:4000
+     NEXT_PUBLIC_API_URL=http://localhost:3000
      ```
 
 4. **Run the Application**:
@@ -145,12 +142,12 @@ Example:
 Provide a breakdown of the tasks undertaken to build the project. Include estimated time spent on each task.
 
 Example:
-- **Setting up backend with Express.js and MongoDB/PostgreSQL**: 6 hours
-- **Implementing JWT authentication**: 4 hours
-- **Data processing and background task handling**: 8 hours
-- **Frontend development (React/Next.js)**: 10 hours
-- **WebSocket/SSE setup for real-time streaming**: 4 hours
-- **Testing and deployment (AWS, Vercel)**: 6 hours
+- **Setting up backend with Express.js and PostgreSQL**:
+- **Implementing JWT authentication**: 
+- **Data processing and background task handling**:
+- **Frontend development (React/Next.js)**:
+- **WebSocket/SSE setup for real-time streaming**:
+- **Testing and deployment (AWS, Vercel)**: 
 
 ---
 
@@ -183,7 +180,7 @@ Example:
 - **Frontend URL**: [Vercel Deployment](https://your-vercel-app-url.com)
 - **Backend URL**: [API on AWS](https://your-aws-api-url.com)
 - **Demo Credentials**:
-  - **Admin**: `admin@example.com` / `password`
+  - **Admin**: `testuser@gmail.com` / `password`
   - **Manager**: `manager@example.com` / `password`
   - **User**: `user@example.com` / `password`
 

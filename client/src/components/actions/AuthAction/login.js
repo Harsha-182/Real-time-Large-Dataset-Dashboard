@@ -12,13 +12,13 @@ export function login(formData = {}) {
                 const request = {
                     url: '/auth/login',
                     method: 'POST',
-                    headers: { 'Access-Control-Allow-Origin': true },
+                    // headers: { 'Access-Control-Allow-Origin': true },
                     data: formData
                 };
                 axios.request({
                     url: request.url,
                     method: request.method || 'post',
-                    baseURL: 'http://localhost:5000',
+                    baseURL: 'https://real-time-large-dataset-dashboard-ojk3.vercel.app',
                     headers: {
                         ...{
                             'Content-Type': 'application/json',

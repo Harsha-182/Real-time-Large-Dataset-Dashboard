@@ -9,13 +9,22 @@ const { httpErrorHandler, passport } = require('./middlewares');
 
 const app = express();
 
-app.use(cors('*'));
+const corsOptions = {
+  origin: 'https://real-time-large-dataset-dashboard.vercel.app',
+  methods: ['GET', 'POST'],
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use(passport.initialize());
+
+app.get('/', async(req,res) => {
+  res.json("hello")
+})
 
 router(app);
 

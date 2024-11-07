@@ -29,7 +29,7 @@ export function fetchUserFromDB(formData = {}) {
                 axios.request({
                     url: request.url,
                     method: request.method || 'get',
-                    baseURL: 'http://localhost:5000',
+                    baseURL: 'https://real-time-large-dataset-dashboard-ojk3-li3m7wc8a.vercel.app',
                     headers: {
                         ...{
                             'Content-Type': 'application/json',

@@ -2,15 +2,22 @@ require('dotenv').config();
 
 module.exports = {
   development: {
-    username: 'postgres',
-    password: 'Cel182@wtc',
-    database: 'Real-Time Taxi Data Management System',
-    host: 'localhost',
+    username: 'default',
+    password: '1FymIxRP9aEc',
+    database: 'verceldb',
+    host: 'ep-bold-meadow-a4zutpbb-pooler.us-east-1.aws.neon.tech',
     dialect: 'postgres',
     port: 5432,
     seederStorage: 'sequelize',
     seederStorageTableName: 'sequelize_seed_data',
     logging: false,
+    ssl: true,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false // Only use `false` for development; set `true` for production
+      }
+    }
   },
   test: {
     username: process.env.DB_USERNAME,

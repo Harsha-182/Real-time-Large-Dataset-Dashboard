@@ -20,12 +20,12 @@ export function filterTrip({startRange, endRange, timeRange},isReset = false) {
                     const request = {
                         url,
                         method: 'GET',
-                        headers: { 'Access-Control-Allow-Origin': true },
+                        // headers: { 'Access-Control-Allow-Origin': true },
                     };
                     axios.request({
                         url: request.url,
                         method: request.method || 'GET',
-                        baseURL: 'http://localhost:5000',
+                        baseURL: 'https://real-time-large-dataset-dashboard-ojk3.vercel.app',
                         headers: {
                             ...{
                                 'Content-Type': 'application/json',

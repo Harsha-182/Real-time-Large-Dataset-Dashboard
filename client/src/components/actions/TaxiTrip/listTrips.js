@@ -25,10 +25,10 @@ export function listTrips(
         const response = await axios({
           url,
           method: 'GET',
-          baseURL: 'http://localhost:5000',
+          baseURL: 'https://real-time-large-dataset-dashboard-ojk3.vercel.app',
           headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': true,
+            // 'Access-Control-Allow-Origin': true,
           },
           timeout: 40000,
         });
