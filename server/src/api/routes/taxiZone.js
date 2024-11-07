@@ -31,7 +31,7 @@ const io =socketIO(server, {
 
 const csvQueue = new Bull('csvUploadQueue');
 
-const redisClient = redis.createClient({ url: 'redis://localhost:6379' });
+const redisClient = redis.createClient({ url: 'redis://default:CuvZzqJq3DKKeWJ70kQM5oQ8uxWQzfF2@redis-12494.c277.us-east-1-3.ec2.redns.redis-cloud.com:12494' });
 redisClient.connect();
 
 redisClient.on('error', (err) => console.log('Redis Client Error', err));
