@@ -39,4 +39,8 @@ app.use((req, res, next) => {
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => httpErrorHandler(err, req, res, next));
 
+app.listen(4000,()=>{
+  console.log('Serving running on port 4000')
+})
+
 module.exports = app;
