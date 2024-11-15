@@ -4,8 +4,8 @@ const express = require('express');
 
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const router = require('./routes');
-const { httpErrorHandler, passport } = require('./middlewares');
+const router = require('./src/api/routes');
+const { httpErrorHandler, passport } = require('./src/api/middlewares');
 
 const app = express();
 
@@ -39,7 +39,7 @@ app.use((req, res, next) => {
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => httpErrorHandler(err, req, res, next));
 
-// app.listen(4000,()=>{
+// app.listen(5000,()=>{
 //   console.log('Serving running on port 4000')
 // })
 
