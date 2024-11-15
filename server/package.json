@@ -4,8 +4,11 @@
   "description": "Nodejs File Structure for reference",
   "main": "app.js",
   "scripts": {
-    "start": "node ./src/api/app.js",
-    "dev": "nodemon ./src/api/app.js"
+    "start": "node ./index.js",
+    "dev": "nodemon ./index.js"
+  },
+  "engines": {
+  "node": "20.x"
   },
   "author": "Celestial Systems (Nodejs)",
   "license": "ISC",
