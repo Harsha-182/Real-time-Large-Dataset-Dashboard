@@ -7,9 +7,6 @@
     "start": "node ./index.js",
     "dev": "nodemon ./index.js"
   },
-  "engines": {
-  "node": "20.x"
-  },
   "author": "Celestial Systems (Nodejs)",
   "license": "ISC",
   "dependencies": {
@@ -30,9 +27,9 @@
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
-    "pg": "^8.9.0",
     "redis": "^4.7.0",
-    "sequelize": "^6.29.0",
+    "pg": "^8.11.0",
+    "sequelize": "^6.32.0",
     "sequelize-cli": "^6.6.0",
     "socket.io": "^4.8.1",
     "umzug": "^3.8.2",
